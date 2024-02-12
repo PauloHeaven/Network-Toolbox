@@ -40,12 +40,12 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentChatBinding.inflate(inflater, container, false);
+        binding = FragmentChatBinding.inflate(inflater, container, false); // Génération du lien vers les éléments graphiques
 
-        binding.switchProtocol.setChecked(true);
-        binding.switchProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> isTcp = isChecked);
+        binding.switchProtocol.setChecked(true); // Utilisation de TCP par défaut
+        binding.switchProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> isTcp = isChecked); // Écouteur sur le changement de position de l'interrupteur. isChecked est un booléen généré automatiquement par les interrupteurs, qui contient sa position
 
-        binding.buttonSendMessage.setOnClickListener(this::onSendMessage);
+        binding.buttonSendMessage.setOnClickListener(this::onSendMessage); // Écouteur du bouton d'envoi
 
         return binding.getRoot();
     }
@@ -56,8 +56,7 @@ public class ChatFragment extends Fragment {
         binding = null;
     }
 
-    public void onSendMessage(View view) {
-        // Get the IP address, port, and message
+    public void onSendMessage(View view) { // Récupère l'adresse IP et le contenu des champs de texte, et dirige vers la bonne fonction selon le protocole
         ipAddress = binding.editTextIpAddress.getText().toString();
         port = Integer.parseInt(binding.editTextPort.getText().toString());
         message = binding.editTextMessage.getText().toString();
@@ -69,26 +68,26 @@ public class ChatFragment extends Fragment {
             }
     }
 
-    private void sendTcpMessage() {
-        new Thread(() -> {
-            try (Socket socket = new Socket(ipAddress, port)) {
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
-                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-                if (author.equals("")) {
+    private void sendTcpMessage() { // Message TCP
+        new Thread(() -> { // Thread
+            try (Socket socket = new Socket(ipAddress, port)) { // Socket client TCP
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream()); // Objet d'écriture sur le sens émission du socket, qui prend en argument ce canal
+                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter); // Objet cache qui stocke ce qu'il va encoyer au streamWriter
+                if (author.equals("")) { // Détection de présence de l'auteur
                     message = JSONConvert(message).toString();
                 } else {
                     message = JSONConvert(message, author).toString();
                 }
-                bufferedWriter.write(message);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
+                bufferedWriter.write(message); // Écriture des informations sur le flux
+                bufferedWriter.newLine(); // Insertion d'un retour chariot
+                bufferedWriter.flush(); // Envoi et effacement du cache
 
-                BufferedReader inputBuf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String messageTxt = inputBuf.readLine();
-                JSONObject JSONstr = new JSONObject(messageTxt);
+                BufferedReader inputBuf = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Meme processus, mais pour le flux de réception
+                String messageTxt = inputBuf.readLine(); // Lecture et stockage des données reçues
+                JSONObject JSONstr = new JSONObject(messageTxt); // Conversion de la chaine de caractères en objet JSON pour en exploiter les données grace aux clés
                 final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
 
-                requireActivity().runOnUiThread(() -> binding.textViewResponse.setText(data));
+                requireActivity().runOnUiThread(() -> binding.textViewResponse.setText(data)); // Mise à jour du champ de texte avec l'accusé de réception
 
             } catch (IOException | JSONException e) {
                 throw new RuntimeException(e);
@@ -104,15 +103,15 @@ public class ChatFragment extends Fragment {
                 } else {
                     message = JSONConvert(message, author).toString();
                 }
-                DatagramSocket datagramSocket = new DatagramSocket();
-                DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);
-                datagramSocket.send(datagramPacket);
-                byte[] responseBytes = new byte[1024];
-                DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
+                DatagramSocket datagramSocket = new DatagramSocket(); // Socket d'émission. Pas de port à préciser, il choisira un port temporaire aléatoire, qui sera exploitable par le serveur pour répondre
+                DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port); // Conversion des données en ASCII, longueur du message, IP et port
+                datagramSocket.send(datagramPacket); // Envoi
+                byte[] responseBytes = new byte[1024]; // Tableau de caractères ASCII pour recevoir le datagramme. Il tient lieu du BufferedReader en TCP.
+                DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length); // Instanciation d'un datagramme pour envoyer la réponse
                 datagramSocket.receive(responsePacket);
 
-                String messageTxt = new String(responseBytes, 0, responsePacket.getLength());
-                JSONObject JSONstr = new JSONObject(messageTxt);
+                String messageTxt = new String(responseBytes, 0, responsePacket.getLength()); // Conversion ASCII vers chaine de caractères
+                JSONObject JSONstr = new JSONObject(messageTxt); // Chaine vers dictionnaire JSON
                 final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
 
                 requireActivity().runOnUiThread(() -> binding.textViewResponse.setText(data));
@@ -125,12 +124,12 @@ public class ChatFragment extends Fragment {
         }).start();
     }
 
-    private JSONObject JSONConvert(String message, String author) throws JSONException {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.FRANCE);
-        LocalDateTime now = LocalDateTime.now();
+    private JSONObject JSONConvert(String message, String author) throws JSONException { // Conversion du message en un dictionnaire JSON
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.FRANCE); // Constitution d'une date à un format habituel
+        LocalDateTime now = LocalDateTime.now(); // Récupération de la date et l'heure courantes
         String date = dtf.format(now);
-        JSONObject JSONstr = new JSONObject();
-        JSONstr.put("content", message);
+        JSONObject JSONstr = new JSONObject(); // Création de l'objet JSON
+        JSONstr.put("content", message); // Ajout des clés et de leurs valeurs
         JSONstr.put("date", date);
         JSONstr.put("author", author);
 

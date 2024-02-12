@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
                 .setAction("Action", null).show());
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_files, R.id.nav_mail, R.id.nav_chat, R.id.nav_date) // Activation des différents fragments qui nous sont utiles
                 .setOpenableLayout(drawer)
@@ -45,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }

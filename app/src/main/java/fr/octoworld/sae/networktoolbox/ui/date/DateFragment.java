@@ -22,7 +22,7 @@ import fr.octoworld.sae.networktoolbox.databinding.FragmentDateBinding;
 
 public class DateFragment extends Fragment {
 
-    private FragmentDateBinding binding;
+    private FragmentDateBinding binding; // Initialisation des variables et des vues
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -30,11 +30,11 @@ public class DateFragment extends Fragment {
 
         binding = FragmentDateBinding.inflate(inflater, container, false);
 
-        binding.setOffset.setOnClickListener(this::onClickSetOffset);
+        binding.setOffset.setOnClickListener(this::onClickSetOffset); // Écouteurs sur les boutons
 
         binding.buttonGettime.setOnClickListener(this::onClickGetTime);
 
-        binding.setOffsetSign.setOnCheckedChangeListener((buttonView, isChecked) -> onClickSetOffsetOperator());
+        binding.setOffsetSign.setOnCheckedChangeListener((buttonView, isChecked) -> onClickSetOffsetOperator()); // Écouteur sur l'interrupteur
         return binding.getRoot();
     }
 
@@ -45,19 +45,19 @@ public class DateFragment extends Fragment {
     }
 
     private TextView time, date;
-    private int offsetValue = 0;
+    private int offsetValue = 0; // Décalage horaire par défaut
     private String signValue = "-";
 
-     public void onClickGetTime(View view){
+     public void onClickGetTime(View view){ // Récupération du temps
         time = binding.textTime;
         date = binding.textDate;
         String serverName = "time.nist.gov";
         int serverPort = 13;
         DisplayTime runnable = new DisplayTime(serverName, serverPort, this.offsetValue);
-        new Thread(runnable).start();
+        new Thread(runnable).start(); // Instanciation de l'objet dans un thread
     }
 
-    public void onClickSetOffsetOperator(){
+    public void onClickSetOffsetOperator(){ // Fonction de changement d'opérateur sur la fenetre et dans le calcul
         SwitchCompat sign = binding.setOffsetSign;
         if (sign.isChecked()){
             this.signValue = "+";
@@ -68,7 +68,7 @@ public class DateFragment extends Fragment {
         }
     }
 
-    public void onClickSetOffset(View view){
+    public void onClickSetOffset(View view){ // Calcul du décalage
         time = binding.textTime;
         date = binding.textDate;
         EditText offset = binding.offset;
@@ -78,9 +78,9 @@ public class DateFragment extends Fragment {
         }
         String serverName = "time.nist.gov";
         int serverPort = 13;
-        DisplayTime runnable = new DisplayTime(serverName, serverPort, this.offsetValue);
+        DisplayTime runnable = new DisplayTime(serverName, serverPort, this.offsetValue); // Instanciation de la classe qui contient les décisions
         new Thread(runnable).start();
-        Toast.makeText(getContext(), getString(R.string.date_offset_saved), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.date_offset_saved), Toast.LENGTH_SHORT).show(); // Bulle de confirmation
     }
 
     private class DisplayTime implements Runnable{
@@ -92,7 +92,7 @@ public class DateFragment extends Fragment {
         private String recDate;
 
 
-        public DisplayTime(String serverName, int serverPort, int offset) {
+        public DisplayTime(String serverName, int serverPort, int offset) { // Constructeur
             this.serverName = serverName;
             this.serverPort = serverPort;
             this.offset = offset;
@@ -100,35 +100,35 @@ public class DateFragment extends Fragment {
 
         public void setOffset(int offset){
             int recHour = Integer.parseInt(this.recTime.split(":")[0]);
-            if (recHour + offset >= 24){
+            if (recHour + offset >= 24){ // Si le nombre obtenu après ajout est de plus 24, on retire 24
                 recHour += offset;
                 recHour -= 24;
             } else if (recHour + offset < 0) {
-                recHour += offset;
+                recHour += offset; // Si l'on obtient une valeur négative, on ajoute 24h
                 recHour += 24;
             } else {
-                recHour += offset;
+                recHour += offset; // Sinon, on ne fait qu'ajouter le décalage
             }
-            this.recTime = recHour + ":" + this.recTime.split(":", 2)[1];
+            this.recTime = recHour + ":" + this.recTime.split(":", 2)[1]; // Reconstitution de la chaine de caractères avec l'heure calculée
         }
 
         @Override
         public void run() {
             try {
-                Socket socket = new Socket(serverName, serverPort);
-                BufferedReader buf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Socket socket = new Socket(serverName, serverPort); // Socket TCP
+                BufferedReader buf = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Enregistrement de l'heure reçue
                 buf.readLine();
                 String data = buf.readLine();
                 this.recTime = data.substring(15,23);
                 String[] recDateUS = data.substring(6, 14).split("-");
-                this.recDate = recDateUS[2] + "/" + recDateUS[1] + "/20" + recDateUS[0];
+                this.recDate = recDateUS[2] + "/" + recDateUS[1] + "/20" + recDateUS[0]; // Conversion du format YY-MM-DD à DD/MM/YYYY
                 socket.close();
                 if (this.offset != 0) {
                     setOffset(this.offset);
                 }
 
                 requireActivity().runOnUiThread(() -> {
-                    time.setText(recTime);
+                    time.setText(recTime); // Mise à jour des textes
                     date.setText(recDate);
                 });
             } catch (IOException e) {
