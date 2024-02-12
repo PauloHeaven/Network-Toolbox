@@ -4,13 +4,14 @@
     <value>
       <entry key="app">
         <State>
+          <multipleDevicesSelectedInDropDown value="true" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\Paul\.android\avd\Pixel_4a_API_34.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="988a16314e5349363630" />
                 </Key>
               </deviceKey>
             </Target>

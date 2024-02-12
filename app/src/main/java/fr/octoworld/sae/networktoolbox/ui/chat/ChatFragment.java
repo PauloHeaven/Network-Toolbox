@@ -1,23 +1,12 @@
 package fr.octoworld.sae.networktoolbox.ui.chat;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,17 +14,14 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Locale;
 
 import fr.octoworld.sae.networktoolbox.R;
@@ -50,7 +36,6 @@ public class ChatFragment extends Fragment {
     private String author;
     private FragmentChatBinding binding;
 
-    private MutableLiveData<String> response = new MutableLiveData<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -58,22 +43,9 @@ public class ChatFragment extends Fragment {
         binding = FragmentChatBinding.inflate(inflater, container, false);
 
         binding.switchProtocol.setChecked(true);
-        binding.switchProtocol.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                isTcp = isChecked;
-            }
-        });
+        binding.switchProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> isTcp = isChecked);
 
-        binding.buttonSendMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSendMessage(view);
-            }
-            public MutableLiveData<String> getResponse() {
-                return response;
-            }
-        });
+        binding.buttonSendMessage.setOnClickListener(this::onSendMessage);
 
         return binding.getRoot();
     }
@@ -98,73 +70,57 @@ public class ChatFragment extends Fragment {
     }
 
     private void sendTcpMessage() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try (Socket socket = new Socket(ipAddress, port)) {
-                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
-                    BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-                    if (author.equals("")) {
-                        message = JSONConvert(message).toString();
-                    } else {
-                        message = JSONConvert(message, author).toString();
-                    }
-                    bufferedWriter.write(message);
-                    bufferedWriter.newLine();
-                    bufferedWriter.flush();
-
-                    BufferedReader inputBuf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String messageTxt = inputBuf.readLine();
-                    JSONObject JSONstr = new JSONObject(messageTxt);
-                    final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
-
-                    requireActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            binding.textViewResponse.setText(data);
-                        }
-                    });
-
-                } catch (IOException | JSONException e) {
-                    throw new RuntimeException(e);
+        new Thread(() -> {
+            try (Socket socket = new Socket(ipAddress, port)) {
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
+                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+                if (author.equals("")) {
+                    message = JSONConvert(message).toString();
+                } else {
+                    message = JSONConvert(message, author).toString();
                 }
+                bufferedWriter.write(message);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+
+                BufferedReader inputBuf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String messageTxt = inputBuf.readLine();
+                JSONObject JSONstr = new JSONObject(messageTxt);
+                final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
+
+                requireActivity().runOnUiThread(() -> binding.textViewResponse.setText(data));
+
+            } catch (IOException | JSONException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }
 
     private void sendUdpMessage() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (author.equals("")) {
-                        message = JSONConvert(message).toString();
-                    } else {
-                        message = JSONConvert(message, author).toString();
-                    }
-                    DatagramSocket datagramSocket = new DatagramSocket();
-                    DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);
-                    datagramSocket.send(datagramPacket);
-                    byte[] responseBytes = new byte[1024];
-                    DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
-                    datagramSocket.receive(responsePacket);
-
-                    String messageTxt = new String(responseBytes, 0, responsePacket.getLength());
-                    JSONObject JSONstr = new JSONObject(messageTxt);
-                    final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
-
-                    requireActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            binding.textViewResponse.setText(data);
-                        }
-                    });
-                    datagramSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+        new Thread(() -> {
+            try {
+                if (author.equals("")) {
+                    message = JSONConvert(message).toString();
+                } else {
+                    message = JSONConvert(message, author).toString();
                 }
+                DatagramSocket datagramSocket = new DatagramSocket();
+                DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);
+                datagramSocket.send(datagramPacket);
+                byte[] responseBytes = new byte[1024];
+                DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
+                datagramSocket.receive(responsePacket);
+
+                String messageTxt = new String(responseBytes, 0, responsePacket.getLength());
+                JSONObject JSONstr = new JSONObject(messageTxt);
+                final String data = getString(R.string.json_author) + JSONstr.getString("author") + "\n" + getString(R.string.json_date) + JSONstr.getString("date") + "\n" + getString(R.string.json_content) + JSONstr.getString("content");
+
+                requireActivity().runOnUiThread(() -> binding.textViewResponse.setText(data));
+                datagramSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }

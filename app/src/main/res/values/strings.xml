@@ -59,4 +59,5 @@
     <string name="alert_server_running">The server\'s already on!</string>
     <string name="alert_invalid_port">Please enter a port number between 1024 and 65535.</string>
     <string name="alert_no_wifi">You must be connected to a Wi-Fi network.</string>
+    <string name="date_UTC_hint" translatable="false">1</string>
 </resources>
