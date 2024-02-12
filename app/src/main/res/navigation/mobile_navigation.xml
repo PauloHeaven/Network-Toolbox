@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="fr.octoworld.sae.networktoolbox.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="fr.octoworld.sae.networktoolbox.ui.gallery.GalleryFragment"
+        android:label="@string/menu_gallery"
+        tools:layout="@layout/fragment_gallery" />
+
+    <fragment
+        android:id="@+id/nav_files"
+        android:name="fr.octoworld.sae.networktoolbox.ui.files.FilesFragment"
+        android:label="@string/menu_files"
+        tools:layout="@layout/fragment_files" />
+
+    <fragment
+        android:id="@+id/nav_mail"
+        android:name="fr.octoworld.sae.networktoolbox.ui.mail.MailFragment"
+        android:label="@string/menu_mail"
+        tools:layout="@layout/fragment_mail" />
+
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="fr.octoworld.sae.networktoolbox.ui.chat.ChatFragment"
+        android:label="@string/menu_chat"
+        tools:layout="@layout/fragment_chat" />
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="fr.octoworld.sae.networktoolbox.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />
+    <fragment
+        android:id="@+id/nav_date"
+        android:name="fr.octoworld.sae.networktoolbox.ui.date.DateFragment"
+        android:label="@string/menu_date"
+        tools:layout="@layout/fragment_date" />
+</navigation>

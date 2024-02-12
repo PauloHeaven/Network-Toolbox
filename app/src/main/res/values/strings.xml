@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name" translatable="false">Network Toolbox</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Paul</string>
+    <string name="nav_header_subtitle" translatable="false">admin@octoworld.fr</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home - Server</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="button_files">Files transfer</string>
+    <string name="button_chat">Chat - Client</string>
+    <string name="button_server">Start TCP server</string>
+    <string name="menu_files">Files</string>
+    <string name="menu_mail">E-mail</string>
+    <string name="menu_chat">Chat - TCP client</string>
+    <string name="menu_date">Time</string>
+    <string name="button_date">Get time</string>
+    <string name="ip_address">Please start the server to check the socket data</string>
+    <string name="port" translatable="false">5555</string>
+    <string name="start_server">Start server</string>
+    <string name="stop_server">Stop server</string>
+    <string name="protocol" translatable="false">UDP/TCP</string>
+    <string name="message">Here will appear the last message received from a client</string>
+    <string name="tcp" translatable="false">UDP/TCP</string>
+    <string name="send_message">Send message</string>
+    <string name="message_tip">Enter your message here</string>
+    <string name="tcp_server_start_success">TCP server started successfully!</string>
+    <string name="udp_server_start_success">UDP server started successfully!</string>
+    <string name="response">Here will appear the acknowledgement from the server</string>
+    <string name="date_hour_text">Time will show here</string>
+    <string name="date_utc" translatable="false">UTC</string>
+    <string name="date_set_offset">Set offset</string>
+    <string name="date_show_hour">Display time</string>
+    <string name="date_minus" translatable="false">-</string>
+    <string name="date_will_show">Time will show here</string>
+    <string name="date_default_offset" translatable="false">1</string>
+    <string name="tcp_server_stop_success">TCP server stopped successfully!</string>
+    <string name="udp_server_stop_success">UDP server stopped successfully!</string>
+    <string name="server_socket">Server IP address and port</string>
+    <string name="server_port" translatable="false">Port</string>
+    <string name="server_client">Here will appear the remote client socket data</string>
+    <string name="chat_ip_address_hint" translatable="false">192.168.0.1</string>
+    <string name="chat_ip_address">Server IP address</string>
+    <string name="chat_transport_protocol">Transport protocol</string>
+    <string name="server_connected_to">Connected to:</string>
+    <string name="server_received_message">Received message:</string>
+    <string name="date_offset_saved">The offset has been applied</string>
+    <string name="date_display">Date will show here</string>
+    <string name="chat_author">Author</string>
+    <string name="json_author">"Author: "</string>
+    <string name="json_date">"Date: "</string>
+    <string name="json_content">Content:</string>
+    <string name="mail_subject">Subject</string>
+    <string name="mail_address">Email address</string>
+    <string name="mail_message">Message</string>
+    <string name="alert_server_running">The server\'s already on!</string>
+    <string name="alert_invalid_port">Please enter a port number between 1024 and 65535.</string>
+    <string name="alert_no_wifi">You must be connected to a Wi-Fi network.</string>
+</resources>
